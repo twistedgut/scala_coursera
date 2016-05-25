@@ -1,7 +1,5 @@
 package com.example
 
-object Hello {
-  def main(args: Array[String]): Unit = {
+object Hello extends App {
     println("Hello, world!")
-  }
 }
