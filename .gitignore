@@ -13,6 +13,7 @@ project/boot/
 project/plugins/project/
 *.iml
 *.xml
+.idea
 
 # Scala-IDE specific
 .scala_dependencies
