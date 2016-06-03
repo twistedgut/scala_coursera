@@ -77,6 +77,11 @@ class FunSetSuite extends FunSuite {
     val s1 = singletonSet(1)
     val s2 = singletonSet(2)
     val s3 = singletonSet(3)
+    val s4 = singletonSet(4)
+    val s = union(s1, s2)
+    val t = union(s2, s3)
+    val u = union(t, s4)
+    val v = intersect(s, t)
   }
 
   /**
@@ -103,12 +108,66 @@ class FunSetSuite extends FunSuite {
 
   test("union contains all elements of each set") {
     new TestSets {
-      val s = union(s1, s2)
       assert(contains(s, 1), "Union 1")
       assert(contains(s, 2), "Union 2")
       assert(!contains(s, 3), "Union 3")
     }
   }
 
+  test("intersect contains common elements of each set") {
+    new TestSets {
+      assert(!contains(v, 1), "Intersect 1")
+      assert(contains(v, 2), "Intersect 2")
+      assert(!contains(v, 3), "Intersect 3")
+    }
+  }
+
+  test("diff contains elements in one set that are not found in a second set") {
+    new TestSets {
+      val z = diff(u, v)
+      assert(!contains(z, 2), "Diff 2")
+      assert(contains(z, 3), "Diff 3")
+      assert(contains(z, 4), "Diff 4")
+    }
+  }
+
+  test("filter contains elements that return true for the function passed as a parameter") {
+    new TestSets {
+      val z = filter(u, x => x % 2 == 0)
+      assert(!contains(z, 1), "Filter 1")
+      assert(contains(z, 2), "Filter 2")
+      assert(!contains(z, 3), "Filter 3")
+      assert(contains(z, 4), "Filter 4")
+    }
+  }
+
+  test("forall returns true when all elements are true for the function passed as a parameter") {
+    new TestSets {
+      val y = union(s2, s4)
+      val z = union(s2, s3)
+      assert(forall(y, x => x % 2 == 0), "Forall all even")
+      assert(!forall(z, x => x % 2 == 0), "Forall one odd")
+    }
+  }
+
+  test("exists returns true if one element is true for the function passed as a parameter") {
+    new TestSets {
+      val y = union(s1, s3)
+      val z = union(s2, s3)
+      assert(!exists(y, x => x % 2 == 0), "Exists all odd")
+      assert(exists(z, x => x % 2 == 0), "Forall one even")
+    }
+  }
+
+  //y => exists(s, x => y == f(x))
+  test("map returns true if one element is true for the function passed as a parameter") {
+    new TestSets {
+      val y = map(u, x => x * x)
+      assert(!contains(y, 2), "Map 2")
+      assert(contains(y, 9), "Map 9")
+      assert(contains(y, 16), "Map 16")
+      assert(!contains(y, 25), "Map 25")
+    }
+  }
 
 }
