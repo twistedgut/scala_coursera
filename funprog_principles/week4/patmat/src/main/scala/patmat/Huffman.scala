@@ -142,7 +142,7 @@ object Huffman {
     def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine)(makeOrderedLeafList(times(chars))).head
   
 
-  // Part 3: Decoding 
+  // Part 3: Decoding
 
   type Bit = Int
 
@@ -150,7 +150,13 @@ object Huffman {
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-    def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+    def loop(rem: CodeTree, bits: List[Bit]): List[Char] = tree match {
+      case Leaf(c, _) => if (bits.isEmpty) List(c) else c :: loop(tree, bits)
+      case Fork(left, right, _, _) => if (bits.head == 0) loop(left, bits.tail) else loop(right, bits.tail)
+    }
+    loop(tree, bits)
+  }
   
   /**
    * A Huffman coding tree for the French language.
@@ -161,14 +167,14 @@ object Huffman {
 
   /**
    * What does the secret message say? Can you decode it?
-   * For the decoding use the `frenchCode' Huffman tree defined above.
-   */
+   * For the decoding use the 'frenchCode' Huffman tree defined above.
+    **/
   val secret: List[Bit] = List(0,0,1,1,1,0,1,0,1,1,1,0,0,1,1,0,1,0,0,1,1,0,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1,1,0,0,0,0,1,0,1,1,1,0,0,1,0,0,1,0,0,0,1,0,0,0,1,0,1)
 
   /**
    * Write a function that returns the decoded secret
    */
-    def decodedSecret: List[Char] = ???
+   def decodedSecret: List[Char] = decode(frenchCode, secret)
   
 
   // Part 4a: Encoding using Huffman tree
