@@ -1,5 +1,7 @@
 package forcomp
 
+import scala.language.postfixOps
+
 
 object Anagrams {
 
@@ -82,7 +84,9 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] =
+    occurrences.map(o => (for (x <- 1 until (o._2 + 1)) yield (o._1, x)) toList)
+               .foldRight(List[Occurrences](Nil))((l,r) => r ++ (for(x <- l; y <- r) yield x :: y))
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -94,7 +98,9 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences =
+    x.map( c => (c._1, c._2 - y.find(_._1 == c._1).getOrElse(c._1,0)._2 ))
+      .filterNot(_._2 == 0)
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
