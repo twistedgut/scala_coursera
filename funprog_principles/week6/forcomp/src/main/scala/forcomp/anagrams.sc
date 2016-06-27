@@ -24,6 +24,35 @@ type Occurrences = List[(Char, Int)]
      .filterNot(_._2 == 0)
 
 
+def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+  def loop(occ: Occurrences): List[Sentence] = {
+    if (occ.isEmpty) List(Nil)
+    else {
+      for {
+        c <- combinations(occ) if dictionaryByOccurrences.keySet(c)
+        d <- dictionaryByOccurrences(c)
+        e <- loop(subtract(occ, c))
+      } yield d :: e
+    }
+  }
+  loop(sentenceOccurrences(sentence))
+}
+
+//def sentenceAnagramsInner(o: Occurrences): List[Sentence] = {
+//  if (o.isEmpty) {
+//    List(Nil)
+//  } else {
+//    val combs = combinations(o)
+//    for (i <- combs if dictionaryByOccurrences.keySet(i);
+//         j <- dictionaryByOccurrences(i);
+//         s <- sentenceAnagramsInner(subtract(o, i))) yield {j :: s}
+//  }
+//}
+
+
+
+
+
 
   //def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 

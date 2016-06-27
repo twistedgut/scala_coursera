@@ -142,5 +142,17 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    def loop(occ: Occurrences): List[Sentence] = {
+      if (occ.isEmpty) List(Nil)
+      else {
+        for {
+          c <- combinations(occ) if dictionaryByOccurrences.keySet(c)
+          d <- dictionaryByOccurrences(c)
+          e <- loop(subtract(occ, c))
+        } yield d :: e
+      }
+    }
+    loop(sentenceOccurrences(sentence))
+  }
 }
