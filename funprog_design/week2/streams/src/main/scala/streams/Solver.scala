@@ -106,5 +106,5 @@ trait Solver extends GameDef {
     case (block, listMoves) #:: tail => listMoves.reverse
     case _ => List.empty
   }
-  
+
 }
