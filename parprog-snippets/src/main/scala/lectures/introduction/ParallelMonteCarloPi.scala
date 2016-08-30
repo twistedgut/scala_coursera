@@ -14,7 +14,7 @@ object ParallelMonteCarloPi {
     Key.exec.maxWarmupRuns -> 40,
     Key.exec.benchRuns -> 20,
     Key.verbose -> true
-  ) withWarmer(new Warmer.Default)
+  ) withWarmer new Warmer.Default
 
   def monteCarloPi(iterations: Int): Double = {
     val randomX = new Random
