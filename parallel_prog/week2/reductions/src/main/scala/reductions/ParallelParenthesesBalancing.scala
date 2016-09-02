@@ -27,12 +27,12 @@ object ParallelParenthesesBalancingRunner {
     println(s"sequential result = $seqResult")
     println(s"sequential balancing time: $seqtime ms")
 
-    val fjtime = standardConfig measure {
-      parResult = ParallelParenthesesBalancing.parBalance(chars, threshold)
-    }
-    println(s"parallel result = $parResult")
-    println(s"parallel balancing time: $fjtime ms")
-    println(s"speedup: ${seqtime / fjtime}")
+//    val fjtime = standardConfig measure {
+//      parResult = ParallelParenthesesBalancing.parBalance(chars, threshold)
+//    }
+//    println(s"parallel result = $parResult")
+//    println(s"parallel balancing time: $fjtime ms")
+//    println(s"speedup: ${seqtime / fjtime}")
   }
 }
 
@@ -41,7 +41,15 @@ object ParallelParenthesesBalancing {
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
    */
   def balance(chars: Array[Char]): Boolean = {
-    ???
+    @tailrec
+    def loop(counter: Int, c: Array[Char]): Boolean = {
+      if (c.isEmpty) counter == 0
+      else if (counter < 0) false
+      else if (c.head == '(') loop(counter + 1, c.tail)
+      else if (c.head == ')') loop(counter - 1, c.tail)
+      else loop(counter, c.tail)
+     }
+    loop(0, chars)
   }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
