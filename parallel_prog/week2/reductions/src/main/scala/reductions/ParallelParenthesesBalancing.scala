@@ -27,12 +27,12 @@ object ParallelParenthesesBalancingRunner {
     println(s"sequential result = $seqResult")
     println(s"sequential balancing time: $seqtime ms")
 
-//    val fjtime = standardConfig measure {
-//      parResult = ParallelParenthesesBalancing.parBalance(chars, threshold)
-//    }
-//    println(s"parallel result = $parResult")
-//    println(s"parallel balancing time: $fjtime ms")
-//    println(s"speedup: ${seqtime / fjtime}")
+    val fjtime = standardConfig measure {
+      parResult = ParallelParenthesesBalancing.parBalance(chars, threshold)
+    }
+    println(s"parallel result = $parResult")
+    println(s"parallel balancing time: $fjtime ms")
+    println(s"speedup: ${seqtime / fjtime}")
   }
 }
 
@@ -52,15 +52,49 @@ object ParallelParenthesesBalancing {
    */
   def parBalance(chars: Array[Char], threshold: Int): Boolean = {
 
-    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int) /*: ???*/ = {
-      ???
+    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int): (Int, Int) = {
+      if (idx < until) {
+        chars(idx) match {
+          case '(' => traverse(idx + 1, until, arg1 + 1, arg2)
+          case ')' =>
+            if (arg1 > 0) traverse(idx + 1, until, arg1 - 1, arg2)
+            else traverse(idx + 1, until, arg1, arg2 + 1)
+          case _ => traverse(idx + 1, until, arg1, arg2)
+        }
+      } else (arg1, arg2)
     }
 
-    def reduce(from: Int, until: Int) /*: ???*/ = {
-      ???
+
+//    if (until - from < threshold) {
+//      Leaf(from, until, reduceSequential(from, until))
+//    } else {
+//      val mid = (from + until) / 2
+//      val (leftTree, rightTree) = parallel(
+//        reduce(from, mid),
+//        reduce(mid, until)
+//      )
+//      Node(leftTree, rightTree)
+//    }
+//  }
+
+    def reduce(from: Int, until: Int): (Int, Int) = {
+      val len = until - from
+      if ( until - from  < threshold ) {
+        traverse(from, until , 0, 0)
+      }
+      else {
+        val mid = (from + until) / 2
+        val ((x1, x2), (y1, y2)) = parallel(reduce(from, mid), reduce(mid, until))
+        // look at values returned and combine according to values of x1 and y2
+        if ( x1 > y2 ) {
+          ( x1 - y2 + y1 ) -> x2
+        } else  {
+          y1 -> ( y2 - x1 + x2 )
+        }
+      }
     }
 
-    reduce(0, chars.length) == ???
+    reduce(0, chars.length) == (0, 0)
   }
 
   // For those who want more:
