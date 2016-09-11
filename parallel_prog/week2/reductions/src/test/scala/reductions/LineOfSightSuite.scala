@@ -17,6 +17,10 @@ class LineOfSightSuite extends FunSuite {
     assert(output.toList == List(0f, 1f, 4f, 4f))
   }
 
+  test("upsweep should correctly compute the tree on the indices 1 until 5 of a 5 element array for threshold 1") {
+    val res = upsweep(Array[Float](0f, 1f, 8f, 9f, 11f), 1, 5, 1)
+    assert(4f == 4f)
+  }
 
   test("upsweepSequential should correctly handle the chunk 1 until 4 of an array of 4 elements") {
     val res = upsweepSequential(Array[Float](0f, 1f, 8f, 9f), 1, 4)

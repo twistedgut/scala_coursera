@@ -54,9 +54,16 @@ object LineOfSight {
 
   /** Traverses the specified part of the array and returns the maximum angle.
    */
-  def upsweepSequential(input: Array[Float], from: Int, until: Int): Float =
-    (from until until).foldLeft(0f)((m, i) => List(input(i) / i, m).max)
-
+  def upsweepSequential(input: Array[Float], from: Int, until: Int): Float = {
+    // (from until until).foldLeft(0f)((m, i) => List(input(i) / i, m).max)
+    var i = from
+    var currentMax = 0f
+    while (i < until) {
+      currentMax = max(currentMax, input(i) / i)
+      i += 1
+    }
+    currentMax
+  }
 
   /** Traverses the part of the array starting at `from` and until `end`, and
    *  returns the reduction tree for that part of the array.
@@ -68,11 +75,15 @@ object LineOfSight {
    */
   def upsweep(input: Array[Float], from: Int, end: Int,
     threshold: Int): Tree = {
-    if ( end - from < threshold ) {
+    val size = end - from
+    //println(s"SIZE = $size")
+    if ( size <= threshold ) {
+      //println(s"Making leaf; $from, $end, ${input.toList.mkString(",")}")
       Leaf(from, end, upsweepSequential(input, from, end))
     }
     else {
-      val mid = ( from + end ) / 2
+      val mid = from + size / 2
+      //println(s"MID = $mid")
       val (l, r) = parallel(
         upsweep(input, from, mid, threshold),
         upsweep(input, mid, end, threshold)
