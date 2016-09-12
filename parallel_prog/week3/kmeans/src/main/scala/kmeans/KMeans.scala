@@ -42,11 +42,24 @@ class KMeans {
     closest
   }
 
+  // map points to closest mean (use findClosest -> given point returns closest mean)
+  // generate GenMap of Point (mean), and GenSeq[Point] -> cluster of points that lie closest to mean
   def classify(points: GenSeq[Point], means: GenSeq[Point]): GenMap[Point, GenSeq[Point]] = {
-    ???
+    val koko = points.groupBy(p => findClosest(p, means))
+
+    for ((k,v) <- koko) printf("key: %s, value: %s\n", k, v)
+
+    val loko = means.map(m => (m, GenSeq())).toMap
+
+    for ((k,v) <- koko) printf("key: %s, value: %s\n", k, v)
+
+    val lolo = loko ++ koko
+
+    lolo
+
   }
 
-  def findAverage(oldMean: Point, points: GenSeq[Point]): Point = if (points.length == 0) oldMean else {
+  def findAverage(oldMean: Point, points: GenSeq[Point]): Point = if (points.isEmpty) oldMean else {
     var x = 0.0
     var y = 0.0
     var z = 0.0
@@ -58,13 +71,12 @@ class KMeans {
     new Point(x / points.length, y / points.length, z / points.length)
   }
 
-  def update(classified: GenMap[Point, GenSeq[Point]], oldMeans: GenSeq[Point]): GenSeq[Point] = {
-    ???
-  }
+  def update(classified: GenMap[Point, GenSeq[Point]], oldMeans: GenSeq[Point]): GenSeq[Point] =
+    oldMeans map (m => findAverage(m, classified(m)))
 
-  def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean = {
-    ???
-  }
+  def converged(eta: Double)(oldMeans: GenSeq[Point], newMeans: GenSeq[Point]): Boolean =
+//    (oldMeans.zip(newMeans) count (x => x._1.squareDistance(x._2) <= eta)) == oldMeans.size
+    !oldMeans.zip(newMeans).exists(x => x._1.squareDistance(x._2) > eta)
 
   @tailrec
   final def kMeans(points: GenSeq[Point], means: GenSeq[Point], eta: Double): GenSeq[Point] = {
@@ -84,7 +96,6 @@ class Point(val x: Double, val y: Double, val z: Double) {
   private def round(v: Double): Double = (v * 100).toInt / 100.0
   override def toString = s"(${round(x)}, ${round(y)}, ${round(z)})"
 }
-
 
 object KMeansRunner {
 
