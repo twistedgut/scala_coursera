@@ -46,4 +46,9 @@ class ParallelParenthesesBalancingSuite extends FunSuite {
   }
 
 
+  test("parBalance should work for string of length 2 and threshold 1") {
+    val res = parBalance(Array[Char]('(', '('), 1)
+    assert(!res)
+  }
+
 }

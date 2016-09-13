@@ -78,11 +78,14 @@ object ParallelParenthesesBalancing {
 //  }
 
     def reduce(from: Int, until: Int): (Int, Int) = {
-      if ( until - from  < threshold ) {
+      val size = until - from
+      //println(s"SIZE = $size")
+      if ( size <= threshold ) {
         traverse(from, until , 0, 0)
       }
       else {
-        val mid = (from + until) / 2
+        val mid = from + size / 2
+        //println(s"MID = $mid")
         val ((x1, x2), (y1, y2)) = parallel(reduce(from, mid), reduce(mid, until))
         // look at values returned and combine according to values of x1 and y2
         if ( x1 > y2 ) {

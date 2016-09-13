@@ -44,20 +44,8 @@ class KMeans {
 
   // map points to closest mean (use findClosest -> given point returns closest mean)
   // generate GenMap of Point (mean), and GenSeq[Point] -> cluster of points that lie closest to mean
-  def classify(points: GenSeq[Point], means: GenSeq[Point]): GenMap[Point, GenSeq[Point]] = {
-    val koko = points.groupBy(p => findClosest(p, means))
-
-    for ((k,v) <- koko) printf("key: %s, value: %s\n", k, v)
-
-    val loko = means.map(m => (m, GenSeq())).toMap
-
-    for ((k,v) <- koko) printf("key: %s, value: %s\n", k, v)
-
-    val lolo = loko ++ koko
-
-    lolo
-
-  }
+  def classify(points: GenSeq[Point], means: GenSeq[Point]): GenMap[Point, GenSeq[Point]] =
+     means.map(m => (m, GenSeq())).toMap ++ points.groupBy(p => findClosest(p, means))
 
   def findAverage(oldMean: Point, points: GenSeq[Point]): Point = if (points.isEmpty) oldMean else {
     var x = 0.0
@@ -78,9 +66,17 @@ class KMeans {
 //    (oldMeans.zip(newMeans) count (x => x._1.squareDistance(x._2) <= eta)) == oldMeans.size
     !oldMeans.zip(newMeans).exists(x => x._1.squareDistance(x._2) > eta)
 
+//  The kMeans method should return the sequence of means, each corresponding to a specific cluster.
+//  Hint: kMeans implements the steps 2-4 from the K-means pseudocode.(x => x._1.squareDistance(x._2) > eta)
+//  2. Associate each input point with the mean that is closest to it. We obtain k clusters of points, and we refer to this process as classifying the points.
+//  3. Update each mean to have the average value of the corresponding cluster.
+//  4. If the k means have significantly changed, go back to step 2. If they did not, we say that the algorithm converged.
   @tailrec
   final def kMeans(points: GenSeq[Point], means: GenSeq[Point], eta: Double): GenSeq[Point] = {
-    if (???) kMeans(???, ???, ???) else ??? // your implementation need to be tail recursive
+    val classifyPoints = classify(points, means)
+    val updateMeans    = update(classifyPoints, means)
+    if (converged(eta)(means, updateMeans)) updateMeans
+    else kMeans(points, updateMeans, eta)
   }
 }
 
