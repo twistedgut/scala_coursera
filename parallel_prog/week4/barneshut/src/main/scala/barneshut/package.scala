@@ -26,37 +26,50 @@ package object barneshut {
   }
 
   sealed abstract class Quad {
+    //massX and massY represent the center of mass of the bodies in the respective cell
     def massX: Float
 
     def massY: Float
 
+    //mass is the total mass of bodies in that cell
     def mass: Float
 
+    //centerX and centerY are the coordinates of the center of the cell
     def centerX: Float
 
     def centerY: Float
 
+    //size is the length of the side of the cell
     def size: Float
 
+    //total is the total number of bodies in the cell
     def total: Int
 
+    //insert creates a new quadtree which additionally contains the body b, and covers the same area in space as the original quadtree
     def insert(b: Body): Quad
   }
 
   case class Empty(centerX: Float, centerY: Float, size: Float) extends Quad {
-    def massX: Float = ???
-    def massY: Float = ???
-    def mass: Float = ???
-    def total: Int = ???
-    def insert(b: Body): Quad = ???
+    def massX: Float = centerX
+    def massY: Float = centerY
+    def mass: Float = 0f
+    def total: Int = 0
+    def insert(b: Body): Quad = Leaf(centerX, centerY, size, Seq(b))
   }
 
   case class Fork(
     nw: Quad, ne: Quad, sw: Quad, se: Quad
   ) extends Quad {
-    val centerX: Float = ???
-    val centerY: Float = ???
-    val size: Float = ???
+    val quads = List(nw, ne, sw, se)
+    val centerXvals = quads.map(_.centerX)
+    val centerYvals = quads.map(_.centerY)
+
+    // e.g. using foldLeft:
+    // quads.foldLeft(Int.MinValue){ (x,y) => math.max(x, y.centerX) 
+
+    val centerX: Float = centerXvals.min + centerXvals.max / 2f //quads.map(_.centerX).min + quads.map(_.centerX).max / 2
+    val centerY: Float = centerYvals.min + centerYvals.max / 2f
+    val size: Float = ne.size * 2
     val mass: Float = ???
     val massX: Float = ???
     val massY: Float = ???
@@ -70,7 +83,7 @@ package object barneshut {
   case class Leaf(centerX: Float, centerY: Float, size: Float, bodies: Seq[Body])
   extends Quad {
     val (mass, massX, massY) = (??? : Float, ??? : Float, ??? : Float)
-    val total: Int = ???
+    val total: Int = 1
     def insert(b: Body): Quad = ???
   }
 
