@@ -64,37 +64,56 @@ package object barneshut {
   case class Fork(
     nw: Quad, ne: Quad, sw: Quad, se: Quad
   ) extends Quad {
-    val quads = List(nw, ne, sw, se)
-    val centerXvals = quads.map(_.centerX)
-    val centerYvals = quads.map(_.centerY)
-
-    // e.g. using foldLeft:
-    // quads.foldLeft(Int.MinValue){ (x,y) => math.max(x, y.centerX) 
-
-    val centerX: Float = centerXvals.min + centerXvals.max / 2f //quads.map(_.centerX).min + quads.map(_.centerX).max / 2
-    val centerY: Float = centerYvals.min + centerYvals.max / 2f
-    val size: Float = ne.size * 2
-    val mass: Float = quads.foldLeft(0f){_ + _.centerX}
-    val massX: Float = mass match {
-        case 0 => centerX
-        case _ => quads.foldLeft(0f){(x,y) => x + (y.massX * y.centerX)} / mass
+    val quads          = List(nw, ne, sw, se)
+    val centerX: Float = nw.centerX + nw.size / 2
+    val centerY: Float = nw.centerY + nw.size / 2
+    val size: Float    = nw.size * 2
+    val mass: Float    = quads.foldLeft(0f){_ + _.mass}
+    val massX: Float   = mass match {
+      case 0 => centerX
+      case _ => quads.foldLeft(0f) { (acc, q) => acc + (q.massX * q.mass)} / mass
     }
-    val massY: Float = mass match {
+    val massY: Float   = mass match {
       case 0 => centerY
-      case _ => quads.foldLeft(0f) { (x, y) => x + (y.massY * y.centerY) } / mass
+      case _ => quads.foldLeft(0f) { (acc, q) => acc + (q.massY * q.mass) } / mass
     }
-    val total: Int = quads.foldLeft(0){_ + _.total}
+    val total: Int     = quads.foldLeft(0){_ + _.total}
 
     def insert(b: Body): Fork = {
-      ???
+      val ltCenterX = b.x < centerX
+      val ltCenterY = b.y < centerY
+
+      (ltCenterX, ltCenterY) match {
+        case (true, true)   => Fork(nw.insert(b), ne, sw, se)
+        case (true, false)  => Fork(nw, ne, sw.insert(b), se)
+        case (false, true)  => Fork(nw, ne.insert(b), sw, se)
+        case (false, false) => Fork(nw, ne, sw, se.insert(b))
+      }
     }
   }
 
   case class Leaf(centerX: Float, centerY: Float, size: Float, bodies: Seq[Body])
   extends Quad {
-    val (mass, massX, massY) = (??? : Float, ??? : Float, ??? : Float)
-    val total: Int = 1
-    def insert(b: Body): Quad = ???
+    val mass: Float  = bodies.foldLeft(0f){_ + _.mass}
+    val massX: Float = bodies.foldLeft(0f){(acc, q) => acc + (q.x * q.mass)} / mass
+    val massY: Float = bodies.foldLeft(0f){(acc, q) => acc + (q.y * q.mass)} / mass
+    val total: Int   = bodies.size
+
+    // if size of a Leaf > minimumSize, create Fork with empty children and add all bodies to Fork
+    // otherwise create new Leaf with all bodies and b inserted into that Leaf .
+
+    def insert(b: Body): Quad =
+      if (size > minimumSize)
+        (bodies :+ b).foldLeft(newFork)((acc, body) => acc.insert(body))
+      else
+        Leaf(centerX, centerY, size, bodies :+ b)
+
+    val newFork = Fork(
+      Empty(centerX - size/4, centerY - size/4, size/2),
+      Empty(centerX + size/4, centerY - size/4, size/2),
+      Empty(centerX - size/4, centerY + size/4, size/2),
+      Empty(centerX + size/4, centerY + size/4, size/2)
+    )
   }
 
   def minimumSize = 0.00001f
