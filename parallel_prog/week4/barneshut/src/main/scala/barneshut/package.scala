@@ -1,6 +1,8 @@
 import common._
 import barneshut.conctrees._
 
+import scala.language.postfixOps
+
 package object barneshut {
 
   class Boundaries {
@@ -201,15 +203,20 @@ package object barneshut {
     for (i <- matrix.indices) matrix(i) = new ConcBuffer
 
     def +=(b: Body): SectorMatrix = {
-
-      ???
+      val x =  (b.x max boundaries.minX) min boundaries.maxX - 1
+      val y =  (b.y max boundaries.minY) min boundaries.maxY - 1
+      this.apply(
+        (x - boundaries.minX) / (boundaries.width / sectorPrecision) toInt,
+        (y - boundaries.minY) / (boundaries.height / sectorPrecision) toInt
+      ) += b
       this
     }
 
     def apply(x: Int, y: Int) = matrix(y * sectorPrecision + x)
 
     def combine(that: SectorMatrix): SectorMatrix = {
-      ???
+      for (i <- matrix.indices) matrix.update(i, matrix(i).combine(that.matrix(i)))
+      this
     }
 
     def toQuad(parallelism: Int): Quad = {
