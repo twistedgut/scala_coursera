@@ -1,2 +1,3 @@
 # scala_coursera
-Code repository for coursera scala certification courses
+Old code repository for coursera scala certification courses
+Moved to private BitBucket repo
